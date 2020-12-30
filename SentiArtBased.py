@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 16 09:24:58 2020
-SentiArt1.0.py basic sentiment analysis tool for literary texts
-@author: ajacobs@zedat.fu-berlin.de
+Created on Wed Dec 30 14:00:00 2020
+Sentiment analysis tool for literary texts based on the SentiArt (Jacobs AM 2019, doi:10.3389/frobt.2019.00053) model.
+@author: wiskom93@zedat.fu-berlin
 """
 # get packages
 import codecs
@@ -104,7 +104,7 @@ def plot(df, title):
 file = ""
 for file in glob.glob("dylan_low_lit/*"):
     sents, tokens = read_tokenize(file)
-    tokens = pos_tag_sents(tokens, tagset="universal")  # simplified pos tagging
+    #tokens = pos_tag_sents(tokens, tagset="universal")  # simplified pos tagging
     sentiment_values = get_sentiments(sa, tokens)
     sentiment_values["tokens"] = tokens
     sentiment_values = round(sentiment_values, 3)
