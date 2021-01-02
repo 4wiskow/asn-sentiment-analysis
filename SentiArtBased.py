@@ -39,7 +39,7 @@ TC = '250kSentiArt_EN.csv' # for English texts
 # TC = '120kSentiArt_DE.xlsx' # for German texts
 #sa = pd.read_excel(TC)
 sa = pd.read_csv(TC)  # csv is way faster
-print(sa.head())
+print("Sentiment Values", sa.head())
 #sa = sa.drop(columns="Unnamed: 0")  # drop index column
 # download('universal_tagset')  # before pos tagging, need to download tag set
 
@@ -102,6 +102,15 @@ def plot(df, title):
     plt.ylabel("Sentiment Value (z)")
     plt.show()
 
+def plot_only_aaps(df, title):
+    print(df.head())
+    df.set_index(df.index,inplace=True)
+    df.plot(kind='bar',alpha=0.75, rot=0, legend=False)
+    plt.title(title)
+    plt.xlabel("Sentence #")
+    plt.ylabel("AAPs")
+    plt.show()
+
 
 file = ""
 for file in glob.glob("dylan_low_lit/*"):
@@ -111,6 +120,7 @@ for file in glob.glob("dylan_low_lit/*"):
     sentiment_values["tokens"] = tokens
     sentiment_values = round(sentiment_values, 3)
     plot(sentiment_values, file[:-4])
+    plot_only_aaps(sentiment_values.loc[:,['aap', 'tokens']], file[:-4])
 
     print(file)
     print(sentiment_values["aap"].mean())
