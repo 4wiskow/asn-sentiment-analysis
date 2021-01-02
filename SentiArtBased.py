@@ -9,15 +9,16 @@ Sentiment analysis tool for literary texts based on the SentiArt (Jacobs AM 2019
 import codecs
 import pandas as pd
 import glob
+import nltk
 from nltk import sent_tokenize, word_tokenize, pos_tag_sents, download
 import matplotlib.pyplot as plt
 
 
-""" get the table with sentiment values (e.g., AAPz, fear_z). 
+""" get the table with sentiment values (e.g., AAPz, fear_z).
 these are based on a vector space model (w2v, skipgram, 300d) and the label list published in:
 https://www.frontiersin.org/articles/10.3389/fnhum.2017.00622/full#supplementary-material; https://www.frontiersin.org/articles/10.3389/fpsyg.2020.574746/full
 the values for each word are: AAPz,ang_z,fear_z,disg_z,hap_z,sad_z,surp_z
-they provide the affective-aesthetic potential (AAP) and discrete emotion values (anger, fear, disgust, sadness and surprise), all standardized (z-values), 
+they provide the affective-aesthetic potential (AAP) and discrete emotion values (anger, fear, disgust, sadness and surprise), all standardized (z-values),
 for each word, based on their semantic relatedness (as computed by w2v) with labels (semantic anchors) described in the publications mentioned in readme.md
 """
 
