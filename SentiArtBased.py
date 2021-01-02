@@ -3,7 +3,7 @@
 """
 Created on Wed Dec 30 14:00:00 2020
 Sentiment analysis tool for literary texts based on the SentiArt (Jacobs AM 2019, doi:10.3389/frobt.2019.00053) model.
-@author: wiskom93@zedat.fu-berlin
+@author: wiskom93@zedat.fu-berlin and terlaul96@zedat.fu-berlin.de
 """
 # get packages
 import codecs
