@@ -8,6 +8,7 @@ Sentiment analysis tool for literary texts based on the SentiArt (Jacobs AM 2019
 # get packages
 import codecs
 import pandas as pd
+import numpy as np
 import glob
 import nltk
 from nltk import sent_tokenize, word_tokenize, pos_tag_sents, download
@@ -105,7 +106,14 @@ def plot(df, title):
 def plot_only_aaps(df, title):
     print(df.head())
     df.set_index(df.index,inplace=True)
-    df.plot(kind='bar',alpha=0.75, rot=0, legend=False)
+    ax = df.plot(kind='bar',alpha=0.75, rot=0, legend=False)
+    x_offset = -0.4
+    y_offset = 0.02
+    for p in ax.patches:
+        if p.get_height() < 0:
+            ax.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2. + x_offset, y_offset))
+        else:
+            ax.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2. + x_offset, p.get_height() + y_offset))
     plt.title(title)
     plt.xlabel("Sentence #")
     plt.ylabel("AAPs")
