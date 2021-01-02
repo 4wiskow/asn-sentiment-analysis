@@ -39,7 +39,8 @@ TC = '250kSentiArt_EN.csv' # for English texts
 # TC = '120kSentiArt_DE.xlsx' # for German texts
 #sa = pd.read_excel(TC)
 sa = pd.read_csv(TC)  # csv is way faster
-sa = sa.drop(columns="Unnamed: 0")  # drop index column
+print(sa.head())
+#sa = sa.drop(columns="Unnamed: 0")  # drop index column
 # download('universal_tagset')  # before pos tagging, need to download tag set
 
 
