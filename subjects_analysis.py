@@ -25,3 +25,16 @@ plt.show()
 ar_df = df.filter(regex="^(AR)").astype("int32")
 ar_df.transpose().hist(xlabelsize=0, ylabelsize=10, sharey=True, figsize=(15, 10))
 plt.show()
+
+## Time
+# sosci computed score for fast completion > 100 indicates low-quality data.
+deg_time = df["DEG_TIME"].astype("int32")
+deg_time[deg_time > 100].empty  # no values > 100, nothing to exclude
+
+time_rsi = df["TIME_RSI"].astype("double")
+time_rsi[time_rsi > 2.].empty  # no values > 2., nothing to exclude
+
+# time taken for study should be more than 20 min
+time_sum = df["TIME_SUM"].astype("int32")
+time_sum[time_sum < 20*60].index  # subject 32 should be excluded
+
