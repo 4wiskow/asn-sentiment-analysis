@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-CSV_FILE_NAME = "data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
+CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 
 # read the data from the CSV
 with open(CSV_FILE_NAME, "r", encoding="utf16") as csv_file:
