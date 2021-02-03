@@ -57,4 +57,3 @@ val_df.mean().hist()
 plt.title("Mean Valence Response")
 plt.show()
 stats.shapiro(val_df.mean())  # p < .5, not normally distributed!
-
