@@ -13,6 +13,7 @@ import glob
 import nltk
 from nltk import sent_tokenize, word_tokenize, pos_tag_sents, download
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 """ get the table with sentiment values (e.g., AAPz, fear_z).
@@ -22,6 +23,10 @@ the values for each word are: AAPz,ang_z,fear_z,disg_z,hap_z,sad_z,surp_z
 they provide the affective-aesthetic potential (AAP) and discrete emotion values (anger, fear, disgust, sadness and surprise), all standardized (z-values),
 for each word, based on their semantic relatedness (as computed by w2v) with labels (semantic anchors) described in the publications mentioned in readme.md
 """
+song_order = ['dylan_low_lit/going_going_gone.txt',
+              'dylan_low_lit/lay_lady_lay.txt',
+              'dylan_low_lit/i_threw_it_all_away',
+              'dylan_low_lit/abandoned_love']
 
 
 def read_tokenize(file):
@@ -37,10 +42,7 @@ def pos_tag(tokens):
 
 
 TC = '250kSentiArt_EN.csv' # for English texts
-# TC = '120kSentiArt_DE.xlsx' # for German texts
-#sa = pd.read_excel(TC)
 sa = pd.read_csv(TC)  # csv is way faster
-print("Sentiment Values", sa.head())
 #sa = sa.drop(columns="Unnamed: 0")  # drop index column
 # download('universal_tagset')  # before pos tagging, need to download tag set
 
@@ -103,6 +105,7 @@ def plot(df, title):
     plt.ylabel("Sentiment Value (z)")
     plt.show()
 
+
 def plot_only_aaps(df, title):
     print(df.head())
     df.set_index(df.index,inplace=True)
@@ -120,15 +123,20 @@ def plot_only_aaps(df, title):
     plt.show()
 
 
-file = ""
-for file in glob.glob("dylan_low_lit/*"):
-    sents, tokens = read_tokenize(file)
-    #tokens = pos_tag_sents(tokens, tagset="universal")  # simplified pos tagging
-    sentiment_values = get_sentiments(sa, tokens)
-    sentiment_values["tokens"] = tokens
-    sentiment_values = round(sentiment_values, 3)
-    plot(sentiment_values, file[:-4])
-    plot_only_aaps(sentiment_values.loc[:,['aap', 'tokens']], file[:-4])
+def calc_aap():
+    file = ""
+    sa_lines = pd.DataFrame()
+    for file in song_order:
+        _, tokens = read_tokenize(file)
+        #tokens = pos_tag_sents(tokens, tagset="universal")  # simplified pos tagging
+        sentiment_values = get_sentiments(sa, tokens)
+        sentiment_values["tokens"] = tokens
+        sa_lines = sa_lines.append(sentiment_values[["tokens", "aap"]], ignore_index=True)
+        #sentiment_values = round(sentiment_values, 3)
+        #plot(sentiment_values, file[:-4])
+        #plot_only_aaps(sentiment_values.loc[:,['aap', 'tokens']], file[:-4])
 
-    print(file)
-    print(sentiment_values["aap"].mean())
+    sa_lines = sa_lines[sa_lines["tokens"].str.len() > 0]  # remove empty lines from initial text parsing
+    sa_lines = sa_lines.reset_index(drop=True)
+    return sa_lines
+
