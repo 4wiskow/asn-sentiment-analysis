@@ -1,6 +1,7 @@
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+from SentiArtBased import calc_aap
 from scipy import stats
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
@@ -47,14 +48,21 @@ plt.suptitle("Valence Response Distribution per Participant")
 plt.show()
 
 # Arousal Mean across participants
-ar_df.mean().hist()
+ar_df.drop([17, 39, 40, 32], axis=0).mean().plot.density()
 plt.title("Mean Arousal Response")
 plt.show()
 stats.shapiro(ar_df.mean())
 
 # Valence Mean across participants
-val_df.mean().hist()
+val_means = val_df.drop([17, 39, 40, 32], axis=0).mean()
+val_means.plot.density()
 plt.title("Mean Valence Response")
 plt.show()
 stats.shapiro(val_df.mean())  # p < .5, not normally distributed!
 
+## Senti Art
+sa_lines = calc_aap()
+if sa_lines.index[0] == 0:  # avoid confusion with sosci index starting from 1
+    sa_lines.index = sa_lines.index + 1
+sa_lines["val_ratings"] = stats.zscore(val_means.values)
+r = sa_lines.corr()
