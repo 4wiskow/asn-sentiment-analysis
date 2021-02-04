@@ -65,4 +65,4 @@ sa_lines = calc_aap()
 if sa_lines.index[0] == 0:  # avoid confusion with sosci index starting from 1
     sa_lines.index = sa_lines.index + 1
 sa_lines["val_ratings"] = stats.zscore(val_means.values)
-r = sa_lines.corr()
+r = sa_lines.corr().iloc[0, 1]
