@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 vsm/.gitkeep
 250kSentiArt_EN.csv
+.idea
