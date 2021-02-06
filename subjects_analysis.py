@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 from SentiArtBased import calc_aap
+from vader import calc_vader_scores
 from scipy import stats
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
@@ -61,8 +62,10 @@ plt.show()
 stats.shapiro(val_df.mean())  # p < .5, not normally distributed!
 
 ## Senti Art
-sa_lines = calc_aap()
-if sa_lines.index[0] == 0:  # avoid confusion with sosci index starting from 1
-    sa_lines.index = sa_lines.index + 1
+sa_lines, sentiArt_hit_rate = calc_aap()
 sa_lines["val_ratings"] = stats.zscore(val_means.values)
 r = sa_lines.corr().iloc[0, 1]
+
+## Vader
+vader_lines, vader_hit_rate = calc_vader_scores()
+predictions_lines = pd.concat([sa_lines, vader_lines.drop("text", axis=1)], axis=1)

@@ -23,13 +23,14 @@ the values for each word are: AAPz,ang_z,fear_z,disg_z,hap_z,sad_z,surp_z
 they provide the affective-aesthetic potential (AAP) and discrete emotion values (anger, fear, disgust, sadness and surprise), all standardized (z-values),
 for each word, based on their semantic relatedness (as computed by w2v) with labels (semantic anchors) described in the publications mentioned in readme.md
 """
-song_order = ['dylan_low_lit/going_going_gone.txt',
+SONGS_ORDERED = ['dylan_low_lit/going_going_gone.txt',
               'dylan_low_lit/lay_lady_lay.txt',
-              'dylan_low_lit/i_threw_it_all_away',
-              'dylan_low_lit/abandoned_love']
+              'dylan_low_lit/i_threw_it_all_away.txt',
+              'dylan_low_lit/abandoned_love.txt']
 
 
 def read_tokenize(file):
+    """Read and tokenize text file"""
     with codecs.open(file, 'r', 'utf-8') as f:
         raw = f.read().replace('\n', '. ').replace('..', '.').replace('!', ' ')
     sents = sent_tokenize(raw)
@@ -37,18 +38,47 @@ def read_tokenize(file):
     return sents, tokens
 
 
+def get_all_tokens(songs):
+    """Get every token in songs"""
+    all_tokens = []
+    for f in songs:
+        _, tokens = read_tokenize(f)
+        all_tokens = all_tokens + [t for line in tokens for t in line]
+    return all_tokens
+
+
 def pos_tag(tokens):
+    """POS tag tokens"""
     return [pos_tag(t) for t in tokens]
 
 
-TC = '250kSentiArt_EN.csv' # for English texts
-sa = pd.read_csv(TC)  # csv is way faster
+#TC = '250kSentiArt_EN.csv' # for English texts
+#sa = pd.read_csv(TC)  # csv is way faster
 #sa = sa.drop(columns="Unnamed: 0")  # drop index column
 # download('universal_tagset')  # before pos tagging, need to download tag set
 
 
-# compute mean AAP (or mean fear etc.) per sentence
+def get_hit_rate(lex_keys):
+    """Calculate hit rate, i.e. rate of song tokens contained in the given lexicon"""
+    tokens = get_all_tokens(SONGS_ORDERED)
+    tokens_hit = 0
+    for token in tokens:
+        if token in lex_keys:
+            tokens_hit += 1
+
+    hit_rate = tokens_hit / len(tokens)
+    return hit_rate
+
+
+def get_sentiArt_lexicon():
+    """Get the lexicon of SentiArt values"""
+    TC = '250kSentiArt_EN.csv'  # for English texts
+    sa = pd.read_csv(TC)
+    return sa
+
+
 def plain_mean(sa, t):
+    """Compute mean of scores of t"""
     dt = sa.query('word in @t')
     vals = [dt.AAPz.mean(),
                      dt.fear_z.mean(),
@@ -61,8 +91,9 @@ def plain_mean(sa, t):
     return vals
 
 
-# word-frequency weighted values
 def freq_weighted(sa, t):
+    """Compute word-frequency weighted values. Higher frequency of a word means it's more important to the overall
+    score. """
     dt = sa.query('word in @t')
     dt = dt.assign(freq=lambda x: [t.count(w) / len(x.word) for w in x.word])  # word freq in t
     vals = [sum(dt.AAPz * dt.freq),
@@ -76,30 +107,20 @@ def freq_weighted(sa, t):
     return vals
 
 
-# compute sentiment values for each sentence
+
 def get_sentiments(sa, tokens_by_sents):
+    """Compute sentiment values for each sentence"""
     vals = pd.DataFrame(columns=["aap", "ang", "fear", "disg", "hap", "sad", "surp"])
     for idx, t in enumerate(tokens_by_sents):
-        vals.loc[idx] = freq_weighted(sa, t)
+        vals.loc[idx] = plain_mean(sa, t)
 
     return vals
 
 
-# panda & save results
-def to_df(tokens, sent_mean_AAPz, sent_mean_fear_z):
-    df = pd.DataFrame()
-    df['sent'] = tokens
-    df['AAPz'] = sent_mean_AAPz
-    df['fear_z'] = sent_mean_fear_z
-    df = round(df,3)
-    # df.to_csv('results.txt')
-    return df
-
-
-# plot AAPz, fear_z etc.
 def plot(df, title):
-    df.set_index(df.index,inplace=True)
-    df.plot(kind='bar',alpha=0.75, rot=0)
+    """Plot all scores for song"""
+    df.set_index(df.index, inplace=True)
+    df.plot(kind='bar', alpha=0.75, rot=0)
     plt.title(title)
     plt.xlabel("Sentence #")
     plt.ylabel("Sentiment Value (z)")
@@ -107,6 +128,7 @@ def plot(df, title):
 
 
 def plot_only_aaps(df, title):
+    """Plot only AAP values for readability"""
     print(df.head())
     df.set_index(df.index,inplace=True)
     ax = df.plot(kind='bar',alpha=0.75, rot=0, legend=False)
@@ -124,9 +146,11 @@ def plot_only_aaps(df, title):
 
 
 def calc_aap():
+    """Calculate the AAP values and hit rate based on SentiArt values provided."""
     file = ""
+    sa = get_sentiArt_lexicon()
     sa_lines = pd.DataFrame()
-    for file in song_order:
+    for file in SONGS_ORDERED:
         _, tokens = read_tokenize(file)
         #tokens = pos_tag_sents(tokens, tagset="universal")  # simplified pos tagging
         sentiment_values = get_sentiments(sa, tokens)
@@ -138,5 +162,7 @@ def calc_aap():
 
     sa_lines = sa_lines[sa_lines["tokens"].str.len() > 0]  # remove empty lines from initial text parsing
     sa_lines = sa_lines.reset_index(drop=True)
-    return sa_lines
+
+    hit_rate = get_hit_rate(sa["word"].values)
+    return sa_lines, hit_rate
 
