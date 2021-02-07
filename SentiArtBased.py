@@ -32,7 +32,7 @@ SONGS_ORDERED = ['dylan_low_lit/going_going_gone.txt',
 def read_tokenize(file):
     """Read and tokenize text file"""
     with codecs.open(file, 'r', 'utf-8') as f:
-        raw = f.read().replace('\n', '. ').replace('..', '.').replace('!', ' ')
+        raw = f.read().replace('\n', '. ').replace('..', '.').replace('!', ' ').lower()
     sents = sent_tokenize(raw)
     tokens = [[t for t in word_tokenize(s) if t.isalpha()] for s in sents]
     return sents, tokens
