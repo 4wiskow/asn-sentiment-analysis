@@ -9,12 +9,8 @@ Sentiment analysis tool for literary texts based on the SentiArt (Jacobs AM 2019
 import codecs
 import pandas as pd
 import numpy as np
-import glob
-import nltk
-from nltk import sent_tokenize, word_tokenize, pos_tag_sents, download
+from nltk import sent_tokenize, word_tokenize
 import matplotlib.pyplot as plt
-import seaborn as sns
-
 
 """ get the table with sentiment values (e.g., AAPz, fear_z).
 these are based on a vector space model (w2v, skipgram, 300d) and the label list published in:
@@ -24,9 +20,9 @@ they provide the affective-aesthetic potential (AAP) and discrete emotion values
 for each word, based on their semantic relatedness (as computed by w2v) with labels (semantic anchors) described in the publications mentioned in readme.md
 """
 SONGS_ORDERED = ['dylan_low_lit/going_going_gone.txt',
-              'dylan_low_lit/lay_lady_lay.txt',
-              'dylan_low_lit/i_threw_it_all_away.txt',
-              'dylan_low_lit/abandoned_love.txt']
+                 'dylan_low_lit/lay_lady_lay.txt',
+                 'dylan_low_lit/i_threw_it_all_away.txt',
+                 'dylan_low_lit/abandoned_love.txt']
 
 
 def read_tokenize(file):
@@ -40,21 +36,22 @@ def read_tokenize(file):
 
 def get_all_tokens(songs):
     """Get every token in songs"""
-    all_tokens = []
+    return [t for line in get_tokens_per_line(songs) for t in line]
+
+
+def get_tokens_per_line(songs):
+    """Get tokens per line in songs"""
+    lines = []
     for f in songs:
         _, tokens = read_tokenize(f)
-        all_tokens = all_tokens + [t for line in tokens for t in line]
-    return all_tokens
+        lines = lines + tokens
+
+    return lines
 
 
-def pos_tag(tokens):
-    """POS tag tokens"""
-    return [pos_tag(t) for t in tokens]
-
-
-#TC = '250kSentiArt_EN.csv' # for English texts
-#sa = pd.read_csv(TC)  # csv is way faster
-#sa = sa.drop(columns="Unnamed: 0")  # drop index column
+# TC = '250kSentiArt_EN.csv' # for English texts
+# sa = pd.read_csv(TC)  # csv is way faster
+# sa = sa.drop(columns="Unnamed: 0")  # drop index column
 # download('universal_tagset')  # before pos tagging, need to download tag set
 
 
@@ -70,6 +67,16 @@ def get_hit_rate(lex_keys):
     return hit_rate
 
 
+def per_line_hit_rate(lines, lex_keys):
+    """Calculate hit rate as mean of hit rate per line"""
+    hit_rates = []
+    for line in lines:
+        if not line: continue  # skip empty lines between verses
+        line_hit_rate = sum([1 for token in line if token in lex_keys]) / len(line)
+        hit_rates.append(line_hit_rate)
+    return hit_rates
+
+
 def get_sentiArt_lexicon():
     """Get the lexicon of SentiArt values"""
     TC = '250kSentiArt_EN.csv'  # for English texts
@@ -81,12 +88,12 @@ def plain_mean(sa, t):
     """Compute mean of scores of t"""
     dt = sa.query('word in @t')
     vals = [dt.AAPz.mean(),
-                     dt.fear_z.mean(),
-                     dt.ang_z.mean(),
-                     dt.disg_z.mean(),
-                     dt.hap_z.mean(),
-                     dt.sad_z.mean(),
-                     dt.surp_z.mean()]
+            dt.fear_z.mean(),
+            dt.ang_z.mean(),
+            dt.disg_z.mean(),
+            dt.hap_z.mean(),
+            dt.sad_z.mean(),
+            dt.surp_z.mean()]
 
     return vals
 
@@ -97,15 +104,14 @@ def freq_weighted(sa, t):
     dt = sa.query('word in @t')
     dt = dt.assign(freq=lambda x: [t.count(w) / len(x.word) for w in x.word])  # word freq in t
     vals = [sum(dt.AAPz * dt.freq),
-             sum(dt.fear_z * dt.freq),
-             sum(dt.ang_z * dt.freq),
-             sum(dt.disg_z * dt.freq),
-             sum(dt.hap_z * dt.freq),
-             sum(dt.sad_z * dt.freq),
-             sum(dt.surp_z * dt.freq)]
+            sum(dt.fear_z * dt.freq),
+            sum(dt.ang_z * dt.freq),
+            sum(dt.disg_z * dt.freq),
+            sum(dt.hap_z * dt.freq),
+            sum(dt.sad_z * dt.freq),
+            sum(dt.surp_z * dt.freq)]
 
     return vals
-
 
 
 def get_sentiments(sa, tokens_by_sents):
@@ -130,15 +136,16 @@ def plot(df, title):
 def plot_only_aaps(df, title):
     """Plot only AAP values for readability"""
     print(df.head())
-    df.set_index(df.index,inplace=True)
-    ax = df.plot(kind='bar',alpha=0.75, rot=0, legend=False)
+    df.set_index(df.index, inplace=True)
+    ax = df.plot(kind='bar', alpha=0.75, rot=0, legend=False)
     x_offset = -0.4
     y_offset = 0.02
     for p in ax.patches:
         if p.get_height() < 0:
-            ax.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2. + x_offset, y_offset))
+            ax.annotate(np.round(p.get_height(), decimals=2), (p.get_x() + p.get_width() / 2. + x_offset, y_offset))
         else:
-            ax.annotate(np.round(p.get_height(),decimals=2), (p.get_x()+p.get_width()/2. + x_offset, p.get_height() + y_offset))
+            ax.annotate(np.round(p.get_height(), decimals=2),
+                        (p.get_x() + p.get_width() / 2. + x_offset, p.get_height() + y_offset))
     plt.title(title)
     plt.xlabel("Sentence #")
     plt.ylabel("AAPs")
@@ -152,17 +159,17 @@ def calc_aap():
     sa_lines = pd.DataFrame()
     for file in SONGS_ORDERED:
         _, tokens = read_tokenize(file)
-        #tokens = pos_tag_sents(tokens, tagset="universal")  # simplified pos tagging
         sentiment_values = get_sentiments(sa, tokens)
         sentiment_values["tokens"] = tokens
         sa_lines = sa_lines.append(sentiment_values[["tokens", "aap"]], ignore_index=True)
-        #sentiment_values = round(sentiment_values, 3)
-        #plot(sentiment_values, file[:-4])
-        #plot_only_aaps(sentiment_values.loc[:,['aap', 'tokens']], file[:-4])
+        # sentiment_values = round(sentiment_values, 3)
+        # plot(sentiment_values, file[:-4])
+        # plot_only_aaps(sentiment_values.loc[:,['aap', 'tokens']], file[:-4])
 
     sa_lines = sa_lines[sa_lines["tokens"].str.len() > 0]  # remove empty lines from initial text parsing
     sa_lines = sa_lines.reset_index(drop=True)
 
-    hit_rate = get_hit_rate(sa["word"].values)
-    print("SentiArt:", sa_lines, hit_rate)
-    return sa_lines, hit_rate
+    hit_rate = per_line_hit_rate(sa_lines["tokens"], sa["word"].values)
+    sa_lines["hit_rate"] = hit_rate
+    #print("SentiArt:", sa_lines, hit_rate)
+    return sa_lines
