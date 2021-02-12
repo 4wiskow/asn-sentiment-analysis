@@ -40,7 +40,7 @@ time_sum.max() / 60  # longest time time to completion 60 min
 
 ## Response Data
 # BFI responses normally distributed?
-bfi_df = df.filter(regex="(BF02_)0?([1-9]|10)$").astype("int32") # leave out mysterious 11th BFI question
+bfi_df = df.filter(regex="(BF02_)0?([1-9]|10)$").astype("int32")  # leave out mysterious 11th BFI question
 bfi_df.hist(xlabelsize=0, ylabelsize=10, sharey=True,)
 plt.title("BFI 10 Response Distributions")
 plt.tight_layout()
