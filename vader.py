@@ -61,18 +61,18 @@ def calc_vader_scores():
     """Calculate scores and hit rate based on VADER"""
     file = ""
     vader_scores = pd.DataFrame()
-    from subjects_analysis import df_ar_mean
+    from subjects_analysis import df_val_mean
     for file in SentiArtBased.SONGS_ORDERED:
         print("File", file)
         df = read_data(file)
         if file == 'dylan_low_lit/going_going_gone.txt':
-            df['Truth'] = df_ar_mean.iloc[0:32][0].round(2)
+            df['Truth'] = df_val_mean.iloc[0:32][0].round(2)
         if file == 'dylan_low_lit/lay_lady_lay.txt':
-            df['Truth'] = df_ar_mean.iloc[32:51][0].round(2)
+            df['Truth'] = df_val_mean.iloc[32:51][0].round(2)
         if file == 'dylan_low_lit/i_threw_it_all_away.txt':
-            df['Truth'] = df_ar_mean.iloc[51:71][0].round(2)
+            df['Truth'] = df_val_mean.iloc[51:71][0].round(2)
         if file == 'dylan_low_lit/abandoned_love.txt':
-            df['Truth'] = df_ar_mean.iloc[71:104][0].round(2)
+            df['Truth'] = df_val_mean.iloc[71:104][0].round(2)
         prediction_values = scores(df)
         vader_scores = vader_scores.append(prediction_values)
         plot(prediction_values, file[:-4])

@@ -82,7 +82,8 @@ stats.shapiro(ar_df.mean())
 
 # Valence Mean across participants
 val_means = val_df.drop(DROP_PARTICIPANTS, axis=0).mean()
-print(val_means)
+df_val_mean = pd.DataFrame([val_means]).transpose()
+df_val_mean = df_val_mean.reset_index()
 val_means.plot.density()
 plt.title("Mean Valence Response")
 plt.show()
