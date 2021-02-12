@@ -164,5 +164,5 @@ def calc_aap():
     sa_lines = sa_lines.reset_index(drop=True)
 
     hit_rate = get_hit_rate(sa["word"].values)
+    print("SentiArt:", sa_lines, hit_rate)
     return sa_lines, hit_rate
-

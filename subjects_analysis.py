@@ -43,15 +43,15 @@ time_sum.max() / 60  # longest time time to completion 60 min
 bfi_df = df.filter(regex="(BF02_)0?([1-9]|10)$").astype("int32")  # leave out mysterious 11th BFI question
 bfi_df.hist(xlabelsize=0, ylabelsize=10, sharey=True,)
 plt.title("BFI 10 Response Distributions")
-plt.tight_layout()
-plt.show()
+#plt.tight_layout()
+#plt.show()
 
 # Dep Variable normally distributed across participants?
 # Participants indicated for exclusion: 17, 39 and 40
 ar_df = df.filter(regex="^(AR)").astype("int32")
 ar_df.transpose().hist(xlabelsize=0, ylabelsize=10, sharey=True, figsize=(15, 10))
-plt.suptitle("Arousal Response Distribution per Participant")
-plt.show()
+#plt.suptitle("Arousal Response Distribution per Participant")
+#plt.show()
 
 ar_by_participant = ar_df.transpose().mean()
 ar_by_participant[abs(stats.zscore(ar_by_participant)) > 2]  # no. 6 is beyond 2 sd, responded w/ 1 throughout song 2
@@ -60,8 +60,8 @@ ar_by_participant[abs(stats.zscore(ar_by_participant)) > 2]  # no. 6 is beyond 2
 # Participants indicated for exclusion: 17, 39 and 40
 val_df = df.filter(regex="VA").astype("int32")
 val_df.transpose().hist(xlabelsize=0, ylabelsize=10, sharey=True, figsize=(15, 10))
-plt.suptitle("Valence Response Distribution per Participant")
-plt.show()
+#plt.suptitle("Valence Response Distribution per Participant")
+#plt.show()
 
 # Participant 6 responded with 7 throughout song 2. Participants 42, 46 generally high values.
 val_by_participant = val_df.transpose().mean()
@@ -69,6 +69,11 @@ val_by_participant[abs(stats.zscore(val_by_participant)) > 2]  # participants 6,
 
 # Arousal Mean across participants
 ar_means = ar_df.drop(DROP_PARTICIPANTS, axis=0).mean()
+df_ar_mean = pd.DataFrame([ar_means]).transpose()
+df_ar_mean = df_ar_mean.reset_index()
+#print("Song 2",  df_ar_mean.iloc[32:51])
+#print("Song 3",  df_ar_mean.iloc[51:71])
+#print("Song 4",  df_ar_mean.iloc[71:104])
 ar_means.plot.density()
 plt.title("Mean Arousal Response")
 plt.show()
@@ -77,7 +82,9 @@ stats.shapiro(ar_df.mean())
 
 # Valence Mean across participants
 val_means = val_df.drop(DROP_PARTICIPANTS, axis=0).mean()
-val_means.plot.hist()
+df_val_mean = pd.DataFrame([val_means]).transpose()
+df_val_mean = df_val_mean.reset_index()
+val_means.plot.density()
 plt.title("Mean Valence Response")
 plt.show()
 stats.shapiro(val_means)  # p < .5, not normally distributed!
