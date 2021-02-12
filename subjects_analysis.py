@@ -77,7 +77,7 @@ stats.shapiro(ar_df.mean())
 
 # Valence Mean across participants
 val_means = val_df.drop(DROP_PARTICIPANTS, axis=0).mean()
-val_means.plot.hist()
+val_means.plot.density()
 plt.title("Mean Valence Response")
 plt.show()
 stats.shapiro(val_means)  # p < .5, not normally distributed!

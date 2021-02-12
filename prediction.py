@@ -28,3 +28,5 @@ r2 = r2_score(sa_lines["aap"], sa_lines["val_z_ratings"])
 ## Vader
 vader_lines, vader_hit_rate = calc_vader_scores()
 predictions_lines = pd.concat([sa_lines, vader_lines.drop("text", axis=1)], axis=1)
+print("predictions_lines vader", predictions_lines)
+print("VADER",vader_hit_rate)
