@@ -48,9 +48,12 @@ r = predictions_lines[["val_z_ratings", "aap", "vader_compound"]].corr()
 r2 = r2_score(sa_lines["aap_post_z"], sa_lines["val_z_ratings"])
 
 # classification
+print(predictions_lines.columns)
 predictions_lines["val_sign"] = (predictions_lines["val_z_ratings"] >= 0).astype("int32")
 vader_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["vader_label"])
 sa_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["aap_label"])
 
 sa_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["aap_label"])
 vader_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["vader_label"])
+print("Accuracy Vader: {} F1-score: {}".format(vader_acc, vader_f1))
+print("Accuracy SentiArt: {} F1-score: {}".format(sa_acc, sa_f1))
