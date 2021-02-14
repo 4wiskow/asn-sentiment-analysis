@@ -1,24 +1,13 @@
-import csv
 import pandas as pd
 from scipy import stats
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from data import read_sosci
+
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 
 DROP_PARTICIPANTS = [6, 17, 32, 39, 40, 42, 46]
-
-
-def read_sosci(fname):
-    """read the data from the CSV"""
-    with open(fname, "r", encoding="utf16") as csv_file:
-        reader = csv.reader(csv_file, delimiter=",")
-        header = next(reader)
-        rows = [r for r in reader]
-        df = pd.DataFrame(rows[1:], columns=header)
-
-    return df
-
 
 df = read_sosci(CSV_FILE_NAME)
 
@@ -37,7 +26,6 @@ time_sum.max() / 60  # longest time time to completion 60 min
 
 ## Response Data
 # BFI responses normally distributed?
-bfi_df = df.filter(regex="(BF02_)0?([1-9]|10)$").astype("int32")  # leave out mysterious 11th BFI question
 #bfi_df.hist(xlabelsize=0, ylabelsize=10, sharey=True,)
 #plt.title("BFI 10 Response Distributions")
 #plt.tight_layout()
