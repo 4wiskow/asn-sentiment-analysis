@@ -16,9 +16,8 @@ from nltk import sent_tokenize, word_tokenize
 
 # Initialize the VADER sentiment analyzer
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-analyzer = SentimentIntensityAnalyzer()
-
 vader = SentimentIntensityAnalyzer()
+
 
 
 def read_data(fname: str, colnames=['text']):
