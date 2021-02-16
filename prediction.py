@@ -23,7 +23,10 @@ ocean = data.read_ocean()
 ols_bfi = sm.OLS(endog=val_df.transpose().mean().values,
                  exog=sm.add_constant(ocean))  # have to add intercept term manually
 res_bfi = ols_bfi.fit()
-res_bfi.summary()  # all dimensions insignificant
+print(res_bfi.summary()) # all dimensions insignificant
+fig = plt.figure(figsize=(15,8))
+fig = sm.graphics.plot_partregress_grid(res_bfi, fig=fig)
+plt.show()
 
 # Language -> Valence Regression
 lang = data.read_language()
@@ -71,4 +74,3 @@ sa_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["aap_la
 
 sa_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["aap_label"])
 vader_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["vader_label"])
-
