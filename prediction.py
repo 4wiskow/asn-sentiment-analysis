@@ -2,6 +2,7 @@ from scipy.stats import stats
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, f1_score, accuracy_score
 import pandas as pd
+import seaborn as sns
 import statsmodels.api as sm
 
 from SentiArtBased import calc_aap
@@ -20,12 +21,17 @@ val_means = val_df.mean()
 ## Regressions
 # BFI -> Valence Regression
 ocean = data.read_ocean()
+ocean['val'] = val_df.transpose().mean().values
+print(ocean)
 ols_bfi = sm.OLS(endog=val_df.transpose().mean().values,
                  exog=sm.add_constant(ocean))  # have to add intercept term manually
 res_bfi = ols_bfi.fit()
 print(res_bfi.summary()) # all dimensions insignificant
-fig = plt.figure(figsize=(15,8))
-fig = sm.graphics.plot_partregress_grid(res_bfi, fig=fig)
+#fig = plt.figure(figsize=(15,8))
+#fig = sm.graphics.plot_partregress_grid(res_bfi, fig=fig)
+
+pd.pivot_table(ocean, values = 'val', index = 'Openness').plot.bar()
+#plt.title("Openess and Valence")
 plt.show()
 
 # Language -> Valence Regression
