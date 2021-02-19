@@ -1,7 +1,9 @@
 from scipy.stats import stats
+import scipy.stats
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, f1_score, accuracy_score
 import pandas as pd
+import seaborn as sns
 import statsmodels.api as sm
 
 from SentiArtBased import calc_aap
@@ -10,7 +12,13 @@ from vader import calc_vader_scores
 
 df = data.read_sosci(data.CSV_FILE_NAME)
 df = df.drop(data.DROP_PARTICIPANTS, axis=0)
+# familiarity with lyrics
+fa_ly = df.filter(regex="LK").astype("int32")
+# familiarity with song
+fa_so = df.filter(regex="SK").astype("int32")
+# arousal
 ar_df = df.filter(regex="^(AR)").astype("int32")
+# valence
 val_df = df.filter(regex="VA").astype("int32")
 
 ar_means = ar_df.mean()
@@ -20,10 +28,22 @@ val_means = val_df.mean()
 ## Regressions
 # BFI -> Valence Regression
 ocean = data.read_ocean()
+ocean['val'] = val_df.transpose().mean().values
+print(ocean.groupby(['Openness']).mean())
+print(ocean.corr())
+#x = ocean['Agreeableness']
+#y = ocean['val']
+#print(scipy.stats.spearmanr(x, y))
 ols_bfi = sm.OLS(endog=val_df.transpose().mean().values,
                  exog=sm.add_constant(ocean))  # have to add intercept term manually
 res_bfi = ols_bfi.fit()
-res_bfi.summary()  # all dimensions insignificant
+print(res_bfi.summary()) # all dimensions insignificant
+#fig = plt.figure(figsize=(15,8))
+#fig = sm.graphics.plot_partregress_grid(res_bfi, fig=fig)
+
+pd.pivot_table(ocean, values = 'val', index = 'Openness').plot.bar()
+#plt.title("Openess and Valence")
+plt.show()
 
 # Language -> Valence Regression
 lang = data.read_language()
@@ -71,4 +91,3 @@ sa_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["aap_la
 
 sa_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["aap_label"])
 vader_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["vader_label"])
-
