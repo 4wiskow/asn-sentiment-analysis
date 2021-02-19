@@ -2,6 +2,8 @@ import csv
 import pandas as pd
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
+GROUP_5_FNAME = "data/group5data.xlsx"
+GROUP_7_FNAME = "data/group7data.xlsx"
 DROP_PARTICIPANTS = [6, 17, 32, 39, 40, 42, 46]
 
 
@@ -13,6 +15,14 @@ def read_sosci(fname):
         rows = [r for r in reader]
         df = pd.DataFrame(rows[1:], columns=header)
 
+    return df
+
+
+def read_group_5():
+    df = pd.read_excel(GROUP_5_FNAME)
+    df = df.iloc[:38, ]  # select only participant data
+    sr = df.filter(regex="SR0")
+    sn = df.filter(regex="SN0")
     return df
 
 
