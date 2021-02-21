@@ -5,6 +5,7 @@ import re
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
 GROUP_7_FNAME = "data/group7data.xlsx"
+ALL_GROUPS = "data/test.xlsx"
 DROP_PARTICIPANTS = [6, 17, 32, 39, 40, 42, 46]
 
 
