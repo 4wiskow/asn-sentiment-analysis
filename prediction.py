@@ -5,9 +5,7 @@ from sklearn.metrics import r2_score, f1_score, accuracy_score
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import seaborn as sns
-import patsy
 import statsmodels.api as sm
-from statsmodels.stats.outliers_influence import variance_inflation_factor
 import sklearn.neighbors as knn
 from sklearn.linear_model import LogisticRegression
 import numpy as np
@@ -52,12 +50,6 @@ plt.show()
 # BFI -> Valence Regression
 ocean = data.read_ocean()
 ocean['val'] = val_df.transpose().mean()#.values
-#ocean['fa_ly'] = fa_ly.transpose().mean()
-#ocean['fa_so'] = fa_so.transpose().mean()
-#print(ocean.groupby(['Openness']).mean())
-#print(ocean.corr())
-#x = ocean[['Agreeableness', 'fa_so']]
-#y = ocean['val']#.values.reshape(-1, 1)
 
 #Y, X = patsy.dmatrices('val  ~ Openness + fa_so', ocean, return_type='dataframe')
 #vif_df = pd.DataFrame()
@@ -77,21 +69,6 @@ ocean['val'] = val_df.transpose().mean()#.values
 #plt.title("Openess and Valence")
 #plt.show()
 
-#regr = LinearRegression()  # create object for the class
-#regr.fit(x, y)  # perform linear regression
-#print('Intercept: \n', regr.intercept_)
-#print('Coefficients: \n', regr.coef_)
-#Y_pred = linear_regressor.predict(x)  # make predictions
-#plt.scatter(x, y)
-#plt.plot(x, Y_pred, color='red')
-#plt.show()
-
-#X = sm.add_constant(x) # adding a constant
-#model = sm.OLS(y, X).fit()
-#predictions = model.predict(X)
-
-#print_model = model.summary()
-#print(print_model)
 
 # Language -> Valence Regression
 lang = data.read_language()

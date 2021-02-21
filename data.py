@@ -1,7 +1,9 @@
 import csv
 import pandas as pd
+import patsy
 import re
 import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
@@ -186,12 +188,17 @@ def all_by_participant():
     fd = cmb_df["familiar_dylan"]
     wd = cmb_df["wellknown_dylan"]
     lang = cmb_df["native_language"]
-    val_open = pd.concat([liking, openness, cmb_df["group"], kd, fd, wd, fa5_1, fa5_2, fa5_3, fa5_4, fa6_1, fa6_2, fa6_3, fa6_4, fa7_1, fa7_2, fa7_3], axis=1)
+    val_open = pd.concat([liking, openness, cmb_df["group"], lang, kd, fd, wd, fa5_1, fa5_2, fa5_3, fa5_4, fa6_1, fa6_2, fa6_3, fa6_4, fa7_1, fa7_2, fa7_3], axis=1)
     val_open = val_open.fillna(0)
     print(val_open.head())
     test = val_open.groupby(['group'])
     for name, group in test:
         if name == "7":
+            #Y, X = patsy.dmatrices('val  ~ openness + SK7_03_01', group, return_type='dataframe') vif = 1 for both songs --> no correlation?
+            #vif_df = pd.DataFrame()
+            #vif_df["vif"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+            #vif_df["features"] = X.columns
+            #print(vif_df)
         # Linear Regression: Openness,familiarity -> Valence for first + 3rd song group 7 significant
             ols_1 = sm.OLS(group["val"].array, sm.add_constant(group.loc[:, ["openness","SK7_01_01"]].astype("float32")))
             res_1 = ols_1.fit()
@@ -206,5 +213,5 @@ def all_by_participant():
             fig = sm.graphics.plot_ccpr_grid(res_3)
             fig.suptitle('Openness-Familiarity for song 3')
 
-    val_open = val_open[["val", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan"]]
+    val_open = val_open[["val", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan", "native_language"]]
     return val_open
