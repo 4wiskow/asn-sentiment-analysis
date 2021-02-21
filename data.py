@@ -119,6 +119,7 @@ def read_combined_data():
             "D012": "native_language",
             "DD01": "knowdylan",
             "DD02": "familiar_dylan",
+            "DD03": "fan_dylan",
             "DD04": "wellknown_dylan",
             "DD05_01": "liking_gen_dylan",
         }
@@ -129,6 +130,7 @@ def read_combined_data():
     new_df["liking_gen_dylan"] = new_df["liking_gen_dylan"].astype("int32")
 
     sex = {1: "female", 2: "male"}
+    new_df["native_language"] = new_df["native_language"].astype("int32")
     highest_edu = {2: "Highschool", 3: "Vocational degree", 4: "Bachelors", 5: "Masters", 6: "Doctorate"}
     native_language = {1: "English", 2: "German", 3: "English-German Bilingual", 4: "Other"}
 
@@ -138,13 +140,15 @@ def read_combined_data():
     new_df['sex'] = new_df['sex'].replace("2", "male")
     new_df['sex'] = new_df['sex'].replace(2, "male")
 
+    new_df["highest_edu_str"] = new_df["highest_edu"]
+    new_df["native_language_str"] = new_df["native_language"]
     for key, value in highest_edu.items():
-        new_df['highest_edu'].replace(str(key), value, inplace=True)
-        new_df['highest_edu'].replace(key, value, inplace=True)
+        new_df['highest_edu_str'].replace(str(key), value, inplace=True)
+        new_df['highest_edu_str'].replace(key, value, inplace=True)
 
     for key, value in native_language.items():
-        new_df['native_language'].replace(str(key), value, inplace=True)
-        new_df['native_language'].replace(key, value, inplace=True)
+        new_df['native_language_str'].replace(str(key), value, inplace=True)
+        new_df['native_language_str'].replace(key, value, inplace=True)
 
     return new_df
 
@@ -164,9 +168,11 @@ def all_by_participant():
     openness = openness.mean(axis=1)
     openness.name = "openness"
 
-    kd = cmb_df["knowdylan"]
-    fd = cmb_df["familiar_dylan"]
-    wd = cmb_df["wellknown_dylan"]
-    lang = cmb_df["native_language"]
-    val_open = pd.concat([liking, openness, cmb_df["group"], kd, fd, wd], axis=1)
+    kd = cmb_df["knowdylan"].astype("int32")
+    fd = cmb_df["familiar_dylan"].astype("int32")
+    wd = cmb_df["wellknown_dylan"].astype("int32")
+    fand = cmb_df["fan_dylan"].astype("int32")
+    lang = cmb_df["native_language"].astype("int32")
+    lik_gen_d = cmb_df["liking_gen_dylan"].astype("int32")
+    val_open = pd.concat([liking, openness, cmb_df["group"], kd, fd, wd, fand, lik_gen_d, lang], axis=1)
     return val_open
