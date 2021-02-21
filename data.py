@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 import patsy
 import re
+from scipy import stats
 import statsmodels.api as sm
 import numpy as np
 from statsmodels.stats.outliers_influence import variance_inflation_factor
@@ -10,6 +11,7 @@ import mord as m
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
 GROUP_7_FNAME = "data/group7data.xlsx"
+CHORDS_AAP = "data/z-scores_AAP_chords.xlsx"
 #ALL_GROUPS = "data/test.xlsx"
 DROP_PARTICIPANTS = [6, 17, 32, 39, 40, 42, 46]
 
@@ -181,6 +183,9 @@ def all_by_participant():
         .mean(axis=1)
     liking.name = "val"
 
+    liking_z = liking.groupby(cmb_df["group"]).transform(stats.zscore)
+    liking_z.name = "val_z"
+
     openness = cmb_df.filter(regex="BF01_0[9,4]").astype("int32")
     openness["BF01_04"] = (openness["BF01_04"] * -1) + 6
     openness = openness.mean(axis=1)
@@ -218,3 +223,10 @@ def all_by_participant():
 
     val_open = val_open[["val", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan", "native_language"]]
     return val_open
+
+
+def read_chords():
+    df = pd.read_excel(CHORDS_AAP, engine='openpyxl').rename(columns={'Unnamed: 0': "line"})
+    df["group_number"] = df["line"].str[0]
+    df["val_z_groups"] = df.groupby("group_number")["val"].transform(stats.zscore)
+    return df
