@@ -5,7 +5,7 @@ import re
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
 GROUP_7_FNAME = "data/group7data.xlsx"
-ALL_GROUPS = "data/test.xlsx"
+#ALL_GROUPS = "data/test.xlsx"
 DROP_PARTICIPANTS = [6, 17, 32, 39, 40, 42, 46]
 
 
@@ -152,6 +152,17 @@ def read_combined_data():
 def all_by_participant():
     """Get mean valence / liking and openness responses per participant by group"""
     cmb_df = read_combined_data()
+    fa5_1 = cmb_df["SK5_01"]
+    fa5_2 = cmb_df["SK5_02"]
+    fa5_3 = cmb_df["SK5_03"]
+    fa5_4 = cmb_df["SK5_04"]
+    fa6_1 = cmb_df["SK6_05_01"]
+    fa6_2 = cmb_df["SK6_06_01"]
+    fa6_3 = cmb_df["SK6_07_01"]
+    fa6_4 = cmb_df["SK6_08_01"]
+    fa7_1 = cmb_df["SK7_01_01"]
+    fa7_2 = cmb_df["SK7_02_01"]
+    fa7_3 = cmb_df["SK7_03_01"]
     cmb_df = cmb_df[cmb_df["QUESTNNR"].isin(["lkng", "Liking", "qnr2"])]  # select ppts of 'liking' conditions
     liking = cmb_df \
         .filter(regex="VA") \

@@ -57,24 +57,24 @@ plt.show()
 # BFI -> Valence Regression
 ocean = data.read_ocean()
 ocean['val'] = val_df.transpose().mean()#.values
-ocean['fa_ly'] = fa_ly.transpose().mean()
-ocean['fa_so'] = fa_so.transpose().mean()
-print(ocean.groupby(['Openness']).mean())
-print(ocean.corr())
-x = ocean[['Agreeableness', 'fa_so']]
-y = ocean['val']#.values.reshape(-1, 1)
+#ocean['fa_ly'] = fa_ly.transpose().mean()
+#ocean['fa_so'] = fa_so.transpose().mean()
+#print(ocean.groupby(['Openness']).mean())
+#print(ocean.corr())
+#x = ocean[['Agreeableness', 'fa_so']]
+#y = ocean['val']#.values.reshape(-1, 1)
 
-Y, X = patsy.dmatrices('val  ~ Openness + fa_so', ocean, return_type='dataframe')
-vif_df = pd.DataFrame()
-vif_df["vif"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
-vif_df["features"] = X.columns
-print(vif_df)
-x_fin = sm.add_constant(x) # adding a constant
+#Y, X = patsy.dmatrices('val  ~ Openness + fa_so', ocean, return_type='dataframe')
+#vif_df = pd.DataFrame()
+#vif_df["vif"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+#vif_df["features"] = X.columns
+#print(vif_df)
+#x_fin = sm.add_constant(x) # adding a constant
 #print(scipy.stats.spearmanr(x, y))
-ols_bfi = sm.OLS(endog=val_df.transpose().mean().values,
-                 exog=x_fin)  # have to add intercept term manually
-res_bfi = ols_bfi.fit()
-print(res_bfi.summary()) # all dimensions insignificant
+#ols_bfi = sm.OLS(endog=val_df.transpose().mean().values,
+#                 exog=x_fin)  # have to add intercept term manually
+#res_bfi = ols_bfi.fit()
+#print(res_bfi.summary()) # all dimensions insignificant
 #fig = plt.figure(figsize=(15,8))
 #fig = sm.graphics.plot_partregress_grid(res_bfi, fig=fig)
 
@@ -139,17 +139,16 @@ r2 = r2_score(sa_lines["aap_post_z"], sa_lines["val_z_ratings"])
 
 # valence sign classification
 predictions_lines["val_sign"] = (predictions_lines["val_z_ratings"] >= 0).astype("int32")
-vader_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["vader_label"])
-sa_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["aap_label"])
+vader_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["vader_label"]) #0.5825242718446602
+sa_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["aap_label"]) #0.5825242718446602
 
-sa_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["aap_label"])
-vader_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["vader_label"])
+sa_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["aap_label"]) # 0.5057471264367815
+vader_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["vader_label"]) # 0.6906474820143884
 
 # KNN
 knn_val_sign = knn.KNeighborsClassifier()
 knn_val_sign.fit(np.expand_dims(predictions_lines["aap"].array, axis=1), predictions_lines["val_sign"].array)
-knn_val_sign.score(np.expand_dims(predictions_lines["aap"].array, axis=1), predictions_lines["val_sign"].array)
+knn_val_sign.score(np.expand_dims(predictions_lines["aap"].array, axis=1), predictions_lines["val_sign"].array) # accuracy 0.7572815533980582
 
 knn_val_sign.fit(np.expand_dims(predictions_lines["vader_compound"].array, axis=1), predictions_lines["val_sign"].array)
-knn_val_sign.score(np.expand_dims(predictions_lines["vader_compound"].array, axis=1), predictions_lines["val_sign"].array)
-
+knn_val_sign.score(np.expand_dims(predictions_lines["vader_compound"].array, axis=1), predictions_lines["val_sign"].array) #accuracy 0.6019417475728155
