@@ -20,11 +20,6 @@ df = data.read_sosci(data.CSV_FILE_NAME)
 df = df.drop(data.DROP_PARTICIPANTS, axis=0)
 # familiarity with lyrics
 fa_ly = df.filter(regex="LK").astype("int32")
-# familiarity with song
-fa_so1 = df.filter(regex="SK05").astype("int32")
-fa_so2 = df.filter(regex="SK06").astype("int32")
-fa_so3 = df.filter(regex="SK07").astype("int32")
-fa_so4 = df.filter(regex="SK08").astype("int32")
 
 # arousal
 ar_df = df.filter(regex="^(AR)").astype("int32")

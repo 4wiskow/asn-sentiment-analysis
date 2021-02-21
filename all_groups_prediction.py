@@ -13,4 +13,3 @@ ols = sm.OLS(val_open["val"].array,
              sm.add_constant(val_open.loc[:, val_open.columns != "val"].astype("float32")))
 res = ols.fit()
 res.summary()  # wellknown dylan p = 0.02
-

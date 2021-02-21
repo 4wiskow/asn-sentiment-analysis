@@ -1,6 +1,7 @@
 import csv
 import pandas as pd
 import re
+import statsmodels.api as sm
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
@@ -152,6 +153,9 @@ def read_combined_data():
 def all_by_participant():
     """Get mean valence / liking and openness responses per participant by group"""
     cmb_df = read_combined_data()
+    cmb_df = cmb_df[cmb_df["QUESTNNR"].isin(["lkng", "Liking", "qnr2"])]  # select ppts of 'liking' conditions
+    #print(cmb_df["native_language"])
+    #cmb_df["native_language"] = cmb_df["native_language"].astype("int32")
     fa5_1 = cmb_df["SK5_01"]
     fa5_2 = cmb_df["SK5_02"]
     fa5_3 = cmb_df["SK5_03"]
@@ -163,7 +167,6 @@ def all_by_participant():
     fa7_1 = cmb_df["SK7_01_01"]
     fa7_2 = cmb_df["SK7_02_01"]
     fa7_3 = cmb_df["SK7_03_01"]
-    cmb_df = cmb_df[cmb_df["QUESTNNR"].isin(["lkng", "Liking", "qnr2"])]  # select ppts of 'liking' conditions
     liking = cmb_df \
         .filter(regex="VA") \
         .astype("float32") \
@@ -179,5 +182,25 @@ def all_by_participant():
     fd = cmb_df["familiar_dylan"]
     wd = cmb_df["wellknown_dylan"]
     lang = cmb_df["native_language"]
-    val_open = pd.concat([liking, openness, cmb_df["group"], kd, fd, wd], axis=1)
+    val_open = pd.concat([liking, openness, cmb_df["group"], kd, fd, wd, fa5_1, fa5_2, fa5_3, fa5_4, fa6_1, fa6_2, fa6_3, fa6_4, fa7_1, fa7_2, fa7_3], axis=1)
+    val_open = val_open.fillna(0)
+    print(val_open.head())
+    test = val_open.groupby(['group'])
+    for name, group in test:
+        if name == "7":
+        # Linear Regression: Openness,familiarity -> Valence for first + 3rd song group 7 significant
+            ols_1 = sm.OLS(group["val"].array, sm.add_constant(group.loc[:, ["openness","SK7_01_01"]].astype("float32")))
+            res_1 = ols_1.fit()
+            print(res_1.summary())
+            fig = sm.graphics.plot_ccpr_grid(res_1)
+            fig.suptitle('Openness-Familiarity for song 1')
+            #fig = sm.graphics.plot_fit(res_1, "openness")
+
+            ols_3 = sm.OLS(group["val"].array, sm.add_constant(group.loc[:, ["openness","SK7_03_01"]].astype("float32")))
+            res_3 = ols_3.fit()
+            print(res_3.summary())
+            fig = sm.graphics.plot_ccpr_grid(res_3)
+            fig.suptitle('Openness-Familiarity for song 3')
+
+    val_open = val_open[["val", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan"]]
     return val_open
