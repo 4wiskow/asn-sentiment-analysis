@@ -5,6 +5,9 @@ from sklearn.metrics import r2_score, f1_score, accuracy_score
 import pandas as pd
 import seaborn as sns
 import statsmodels.api as sm
+import sklearn.neighbors as knn
+from sklearn.linear_model import LogisticRegression
+import numpy as np
 
 from SentiArtBased import calc_aap
 import data
@@ -91,3 +94,12 @@ sa_acc = accuracy_score(predictions_lines["val_sign"], predictions_lines["aap_la
 
 sa_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["aap_label"])
 vader_f1 = f1_score(predictions_lines["val_sign"], predictions_lines["vader_label"])
+
+# KNN
+knn_val_sign = knn.KNeighborsClassifier()
+knn_val_sign.fit(np.expand_dims(predictions_lines["aap"].array, axis=1), predictions_lines["val_sign"].array)
+knn_val_sign.score(np.expand_dims(predictions_lines["aap"].array, axis=1), predictions_lines["val_sign"].array)
+
+knn_val_sign.fit(np.expand_dims(predictions_lines["vader_compound"].array, axis=1), predictions_lines["val_sign"].array)
+knn_val_sign.score(np.expand_dims(predictions_lines["vader_compound"].array, axis=1), predictions_lines["val_sign"].array)
+
