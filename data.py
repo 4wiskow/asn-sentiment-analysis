@@ -149,7 +149,7 @@ def read_combined_data():
     return new_df
 
 
-def all_val_openness():
+def all_by_participant():
     """Get mean valence / liking and openness responses per participant by group"""
     cmb_df = read_combined_data()
     cmb_df = cmb_df[cmb_df["QUESTNNR"].isin(["lkng", "Liking", "qnr2"])]  # select ppts of 'liking' conditions
@@ -164,5 +164,9 @@ def all_val_openness():
     openness = openness.mean(axis=1)
     openness.name = "openness"
 
-    val_open = pd.concat([liking, openness, cmb_df["group"]], axis=1)
+    kd = cmb_df["knowdylan"]
+    fd = cmb_df["familiar_dylan"]
+    wd = cmb_df["wellknown_dylan"]
+    lang = cmb_df["native_language"]
+    val_open = pd.concat([liking, openness, cmb_df["group"], kd, fd, wd], axis=1)
     return val_open
