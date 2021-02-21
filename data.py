@@ -3,7 +3,9 @@ import pandas as pd
 import patsy
 import re
 import statsmodels.api as sm
+import numpy as np
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+import mord as m
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
@@ -199,19 +201,20 @@ def all_by_participant():
             #vif_df["vif"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
             #vif_df["features"] = X.columns
             #print(vif_df)
-        # Linear Regression: Openness,familiarity -> Valence for first + 3rd song group 7 significant
+            print("Linearly Independent", np.linalg.matrix_rank(np.array([group['openness'], group['SK7_01_01']]).T)) ## Full rank: 2 --> linearly independent
+            # Linear Regression: Openness,familiarity -> Valence for first + 3rd song group 7 significant
             ols_1 = sm.OLS(group["val"].array, sm.add_constant(group.loc[:, ["openness","SK7_01_01"]].astype("float32")))
             res_1 = ols_1.fit()
             print(res_1.summary())
-            fig = sm.graphics.plot_ccpr_grid(res_1)
-            fig.suptitle('Openness-Familiarity for song 1')
+            #fig = sm.graphics.plot_ccpr_grid(res_1)
+            #fig.suptitle('Openness-Familiarity for song 1')
             #fig = sm.graphics.plot_fit(res_1, "openness")
-
+            
             ols_3 = sm.OLS(group["val"].array, sm.add_constant(group.loc[:, ["openness","SK7_03_01"]].astype("float32")))
             res_3 = ols_3.fit()
             print(res_3.summary())
-            fig = sm.graphics.plot_ccpr_grid(res_3)
-            fig.suptitle('Openness-Familiarity for song 3')
+            #fig = sm.graphics.plot_ccpr_grid(res_3)
+            #fig.suptitle('Openness-Familiarity for song 3')
 
     val_open = val_open[["val", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan", "native_language"]]
     return val_open
