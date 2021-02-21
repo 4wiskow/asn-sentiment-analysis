@@ -1,10 +1,12 @@
 import csv
 import pandas as pd
 import re
+from scipy import stats
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
 GROUP_7_FNAME = "data/group7data.xlsx"
+CHORDS_AAP = "data/z-scores_AAP_chords.xlsx"
 #ALL_GROUPS = "data/test.xlsx"
 DROP_PARTICIPANTS = [6, 17, 32, 39, 40, 42, 46]
 
@@ -174,6 +176,9 @@ def all_by_participant():
         .mean(axis=1)
     liking.name = "val"
 
+    liking_z = liking.groupby(cmb_df["group"]).transform(stats.zscore)
+    liking_z.name = "val_z"
+
     openness = cmb_df.filter(regex="BF01_0[9,4]").astype("int32")
     openness["BF01_04"] = (openness["BF01_04"] * -1) + 6
     openness = openness.mean(axis=1)
@@ -183,7 +188,16 @@ def all_by_participant():
     fd = cmb_df["familiar_dylan"].astype("int32")
     wd = cmb_df["wellknown_dylan"].astype("int32")
     fand = cmb_df["fan_dylan"].astype("int32")
-    lang = cmb_df["native_language"].astype("int32")
+    lang = cmb_df["native_language_str"]#.astype("int32")
     lik_gen_d = cmb_df["liking_gen_dylan"].astype("int32")
-    val_open = pd.concat([liking, openness, cmb_df["group"], kd, fd, wd, fand, lik_gen_d, lang], axis=1)
+    val_open = pd.concat(
+        [liking, liking_z, openness, cmb_df["group"], kd, fd, wd, fand, lik_gen_d, lang],
+        axis=1)
     return val_open
+
+
+def read_chords():
+    df = pd.read_excel(CHORDS_AAP, engine='openpyxl').rename(columns={'Unnamed: 0': "line"})
+    df["group_number"] = df["line"].str[0]
+    df["val_z_groups"] = df.groupby("group_number")["val"].transform(stats.zscore)
+    return df
