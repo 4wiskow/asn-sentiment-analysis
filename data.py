@@ -172,8 +172,6 @@ def all_by_participant():
     """Get mean valence / liking and openness responses per participant by group"""
     cmb_df = read_combined_data()
     cmb_df = cmb_df[cmb_df["QUESTNNR"].isin(["lkng", "Liking", "qnr2"])]  # select ppts of 'liking' conditions
-    #print(cmb_df["native_language"])
-    #cmb_df["native_language"] = cmb_df["native_language"].astype("int32")
     fa5_1 = cmb_df["SK5_01"]
     fa5_2 = cmb_df["SK5_02"]
     fa5_3 = cmb_df["SK5_03"]
@@ -185,6 +183,10 @@ def all_by_participant():
     fa7_1 = cmb_df["SK7_01_01"]
     fa7_2 = cmb_df["SK7_02_01"]
     fa7_3 = cmb_df["SK7_03_01"]
+    li_1 = cmb_df["SR01_07"]
+    li_2 = cmb_df["SR02_07"]
+    li_3 = cmb_df["SR03_07"]
+    li_4 = cmb_df["SR04_07"]
     liking = cmb_df \
         .filter(regex="VA") \
         .astype("float32") \
@@ -203,35 +205,42 @@ def all_by_participant():
     fd = cmb_df["familiar_dylan"]
     wd = cmb_df["wellknown_dylan"]
     lang = cmb_df["native_language"]
-    lang_str = cmb_df["native_language_str"]
-    val_open = pd.concat([liking, liking_z, openness, cmb_df["group"], lang, lang_str, kd, fd, wd, fa5_1, fa5_2, fa5_3, fa5_4, fa6_1, fa6_2, fa6_3, fa6_4, fa7_1, fa7_2, fa7_3], axis=1)
+    val_open = pd.concat([liking, liking_z, openness, cmb_df["group"], lang, kd, fd, wd, li_1, li_2, li_3, li_4, fa5_1, fa5_2, fa5_3, fa5_4, fa6_1, fa6_2, fa6_3, fa6_4, fa7_1, fa7_2, fa7_3], axis=1)
     val_open = val_open.fillna(0)
-
+    val_open['val_z_abs'] = val_open['val_z'].abs()
+    #print(val_open['val_z_abs'])
     print(val_open.head())
     test = val_open.groupby(['group'])
     for name, group in test:
-        if name == "7":
+        print(group.head())
+        if name == "5":
             #Y, X = patsy.dmatrices('val  ~ openness + SK7_03_01', group, return_type='dataframe') vif = 1 for both songs --> no correlation?
             #vif_df = pd.DataFrame()
             #vif_df["vif"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
             #vif_df["features"] = X.columns
             #print(vif_df)
-            print("Linearly Independent", np.linalg.matrix_rank(np.array([group['openness'], group['SK7_01_01']]).T)) ## Full rank: 2 --> linearly independent
+            #print("Linearly Independent", np.linalg.matrix_rank(np.array([group['openness'], group['SK6_05_01']]).T)) ## Full rank: 2 --> linearly independent
             # Linear Regression: Openness,familiarity -> Valence for first + 3rd song group 7 significant
-            ols_1 = sm.OLS(group["val"].array, sm.add_constant(group.loc[:, ["openness","SK7_01_01"]].astype("float32")))
+            ols_1 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_01"]].astype("float32")))
             res_1 = ols_1.fit()
-            print(res_1.summary())
+            #print(res_1.summary())
             #fig = sm.graphics.plot_ccpr_grid(res_1)
             #fig.suptitle('Openness-Familiarity for song 1')
             #fig = sm.graphics.plot_fit(res_1, "openness")
-            
-            ols_3 = sm.OLS(group["val"].array, sm.add_constant(group.loc[:, ["openness","SK7_03_01"]].astype("float32")))
+            ols_2 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_02"]].astype("float32")))
+            res_2 = ols_2.fit()
+            #print(res_2.summary())
+
+            ols_3 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_03"]].astype("float32")))
             res_3 = ols_3.fit()
-            print(res_3.summary())
+            #print(res_3.summary())
             #fig = sm.graphics.plot_ccpr_grid(res_3)
             #fig.suptitle('Openness-Familiarity for song 3')
+            ols_4 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_04"]].astype("float32")))
+            res_4 = ols_4.fit()
+            #print(res_4.summary())
 
-    val_open = val_open[["val", "val_z_groups", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan", "native_language_str"]]
+    val_open = val_open[["val", "val_z", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan", "native_language"]]
     return val_open
 
 

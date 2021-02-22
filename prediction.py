@@ -40,7 +40,7 @@ plt.plot(val3_df.mean().values)
 plt.plot(val4_df.mean().values)
 plt.title("Valence mean for 4 songs")
 plt.xlabel("Line")
-plt.ylabel("y")
+plt.ylabel("Valence")
 plt.legend(["val 1", "val 2", "val 3", "val 4"])
 plt.show()
 
