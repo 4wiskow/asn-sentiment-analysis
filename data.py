@@ -6,7 +6,7 @@ from scipy import stats
 import statsmodels.api as sm
 import numpy as np
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-import mord as m
+import matplotlib.pyplot as plt
 
 CSV_FILE_NAME = "data/data_Song_Lyrics_Gr6_2021-01-31_18-33.csv"
 GROUP_5_FNAME = "data/group5data.xlsx"
@@ -179,6 +179,39 @@ def all_by_participant():
     li_2 = cmb_df["SR02_07"]
     li_3 = cmb_df["SR03_07"]
     li_4 = cmb_df["SR04_07"]
+    #print(cmb_df.filter(regex='VA7_0'))
+    val5_1 = cmb_df.filter(regex="VA5_01").astype("float32")
+    val5_1 = val5_1.dropna()
+    val5_2 = cmb_df.filter(regex="VA5_02").astype("float32")
+    val5_2 = val5_2.dropna()
+    val5_3 = cmb_df.filter(regex="VA5_03").astype("float32")
+    val5_3 = val5_3.dropna()
+    val5_4 = cmb_df.filter(regex="VA5_04").astype("float32")
+    val5_4 = val5_4.dropna()
+    val6_1 = cmb_df.filter(regex="VA6_01").astype("float32")
+    val6_1 = val6_1.dropna()
+    val6_2 = cmb_df.filter(regex="VA6_02").astype("float32")
+    val6_2 = val6_2.dropna()
+    val6_3 = cmb_df.filter(regex="VA6_03").astype("float32")
+    val6_3 = val6_3.dropna()
+    val6_4 = cmb_df.filter(regex="VA6_04").astype("float32")
+    val6_4 = val6_4.dropna()
+    print(val6_1.mean())
+
+    plt.plot(val5_1.mean().values)
+    plt.plot(val5_2.mean().values)
+    plt.plot(val5_3.mean().values)
+    plt.plot(val5_4.mean().values)
+    plt.plot(val6_1.mean().values)
+    plt.plot(val6_2.mean().values)
+    plt.plot(val6_3.mean().values)
+    plt.plot(val6_4.mean().values)
+    plt.title("Valence mean for group 5 and 6 for all songs")
+    plt.xlabel("Line")
+    plt.ylabel("Valence")
+    plt.legend(["val5 1", "val5 2", "val5 3", "val5 4", "val6 1", "val6 2", "val6 3", "val6 4"])
+    plt.show()
+
     liking = cmb_df \
         .filter(regex="VA") \
         .astype("float32") \
@@ -201,11 +234,11 @@ def all_by_participant():
     val_open = val_open.fillna(0)
     val_open['val_z_abs'] = val_open['val_z'].abs()
     #print(val_open['val_z_abs'])
-    print(val_open.head())
+    print(val_open)
     test = val_open.groupby(['group'])
     for name, group in test:
-        print(group.head())
-        if name == "5":
+        print(name)
+        if name == "7":
             #Y, X = patsy.dmatrices('val  ~ openness + SK7_03_01', group, return_type='dataframe') vif = 1 for both songs --> no correlation?
             #vif_df = pd.DataFrame()
             #vif_df["vif"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
@@ -213,24 +246,34 @@ def all_by_participant():
             #print(vif_df)
             #print("Linearly Independent", np.linalg.matrix_rank(np.array([group['openness'], group['SK6_05_01']]).T)) ## Full rank: 2 --> linearly independent
             # Linear Regression: Openness,familiarity -> Valence for first + 3rd song group 7 significant
-            ols_1 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_01"]].astype("float32")))
+            ols_1 = sm.OLS(group["SR01_07"].astype(float), sm.add_constant(group.loc[:, ["openness","val_z"]].astype("float32")))
             res_1 = ols_1.fit()
             #print(res_1.summary())
+            #fig = sm.graphics.plot_partregress_grid(res_1)
+            #fig.suptitle('Openness-Valence(z) predict Liking Song 1')
+            #plt.show()
             #fig = sm.graphics.plot_ccpr_grid(res_1)
             #fig.suptitle('Openness-Familiarity for song 1')
             #fig = sm.graphics.plot_fit(res_1, "openness")
-            ols_2 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_02"]].astype("float32")))
+            ols_2 = sm.OLS(group["SR02_07"].astype(float), sm.add_constant(group.loc[:, ["openness","val_z"]].astype("float32")))
             res_2 = ols_2.fit()
             #print(res_2.summary())
 
-            ols_3 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_03"]].astype("float32")))
+            ols_3 = sm.OLS(group["SR03_07"].astype(float), sm.add_constant(group.loc[:, ["openness","val_z"]].astype("float32")))
             res_3 = ols_3.fit()
             #print(res_3.summary())
-            #fig = sm.graphics.plot_ccpr_grid(res_3)
-            #fig.suptitle('Openness-Familiarity for song 3')
-            ols_4 = sm.OLS(group["val_z_abs"].array, sm.add_constant(group.loc[:, ["openness","SK5_04"]].astype("float32")))
-            res_4 = ols_4.fit()
+            #fig = sm.graphics.plot_partregress_grid(res_3)
+            #fig.suptitle('Openness-Familiarity Song 3')
+            #plt.show()
+
+
+            #ols_4 = sm.OLS(group["SR04_07"].astype(float), sm.add_constant(group.loc[:, ["openness","val_z"]].astype("float32")))
+            #res_4 = ols_4.fit()
             #print(res_4.summary())
+            #fig = sm.graphics.plot_ccpr_grid(res_4)
+            #fig.suptitle('Openness-Valence(z) predict Liking Song 4')
+            #plt.show()
+
 
     val_open = val_open[["val", "val_z", "openness", "group", "knowdylan", "familiar_dylan", "wellknown_dylan", "native_language"]]
     return val_open
