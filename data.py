@@ -155,15 +155,15 @@ def read_combined_data():
     new_df['sex'] = new_df['sex'].replace("2", "male")
     new_df['sex'] = new_df['sex'].replace(2, "male")
 
-    new_df["highest_edu_str"] = new_df["highest_edu"]
-    new_df["native_language_str"] = new_df["native_language"]
+    new_df["highest_edu"] = new_df["highest_edu"]
+    new_df["native_language"] = new_df["native_language"]
     for key, value in highest_edu.items():
-        new_df['highest_edu_str'].replace(str(key), value, inplace=True)
-        new_df['highest_edu_str'].replace(key, value, inplace=True)
+        new_df['highest_edu'].replace(str(key), value, inplace=True)
+        new_df['highest_edu'].replace(key, value, inplace=True)
 
     for key, value in native_language.items():
-        new_df['native_language_str'].replace(str(key), value, inplace=True)
-        new_df['native_language_str'].replace(key, value, inplace=True)
+        new_df['native_language'].replace(str(key), value, inplace=True)
+        new_df['native_language'].replace(key, value, inplace=True)
 
     return new_df
 
@@ -194,7 +194,7 @@ def all_by_participant():
     liking.name = "val"
 
     liking_z = liking.groupby(cmb_df["group"]).transform(stats.zscore)
-    liking_z.name = "val_z_groups"
+    liking_z.name = "val_z"
 
     openness = cmb_df.filter(regex="BF01_0[9,4]").astype("int32")
     openness["BF01_04"] = (openness["BF01_04"] * -1) + 6
@@ -247,5 +247,5 @@ def all_by_participant():
 def read_chords():
     df = pd.read_excel(CHORDS_AAP, engine='openpyxl').rename(columns={'Unnamed: 0': "line"})
     df["group_number"] = df["line"].str[0]
-    df["val_z_groups"] = df.groupby("group_number")["val"].transform(stats.zscore)
+    df["val_z"] = df.groupby("group_number")["val"].transform(stats.zscore)
     return df
